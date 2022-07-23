@@ -1,5 +1,6 @@
 import pygame
 import sys
+from os.path import exists as file_exists
 import math
 
 class Game:
@@ -16,6 +17,7 @@ class Game:
         self.height = height
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.clock = pygame.time.Clock()
+        self.highscore = self.highScore()
 
         main_character = Spaceship(self)
         main_sprite = pygame.sprite.Group()
@@ -28,9 +30,16 @@ class Game:
             alien_sprite.add(alien)
 
         while True:
+            
             if len(self.aliens) == 0:
                 self.displayText("You survived!", 60, (self.width/5, self.height/4))
-                self.displayText(f"Final Score = {self.score}", 50,  (self.width/6, self.height/2))
+                self.displayText(f"Final Score: {self.score}", 50,  (self.width/6, self.height/2))
+                if self.score > self.highscore:
+                    self.displayText(f"New High Score!", 55,  (self.width/6, self.height/2 + 70))
+                    with open("highscore.txt", "w") as f:
+                        f.write(str(self.score))
+                else:
+                    self.displayText(f"Current High Score: {self.highscore}", 45,  (self.width/6, self.height/2 + 60))
 
             if self.game_continue:
                 alien_sprite.draw(self.screen)
@@ -38,8 +47,13 @@ class Game:
                 self.displayText(f"Score: {self.score}", 25, (10, 10))
             else:
                 self.displayText("You died!", 60, (self.width/5, self.height/4))
-                self.displayText(f"Final Score = {self.score}", 50,  (self.width/6, self.height/2))
-
+                self.displayText(f"Final Score: {self.score}", 50,  (self.width/6, self.height/2))
+                if self.score > self.highscore:
+                    self.displayText(f"New High Score!", 55,  (self.width/6, self.height/2 + 70))
+                    with open("highscore.txt", "w") as f:
+                        f.write(str(self.score))
+                else:
+                    self.displayText(f"Current High Score: {self.highscore}", 45,  (self.width/6, self.height/2 + 60))
             
             key = pygame.key.get_pressed()
     
@@ -84,6 +98,15 @@ class Game:
         font = pygame.font.SysFont("Times New Roman", size)
         text_rendered = font.render(text, 1, (250, 250, 250))
         self.screen.blit(text_rendered, pos)
+    
+    def highScore(self):
+        if file_exists("highscore.txt"):
+            with open("highscore.txt", "r") as f:
+                current_highscore = f.readline()                
+                return int(current_highscore)
+        else:
+            return 0
+
 
 class Spaceship(pygame.sprite.Sprite):
     def __init__(self, game):
@@ -102,7 +125,6 @@ class Spaceship(pygame.sprite.Sprite):
                 alien.kill()
                 game.game_continue = False
                 self.kill()
-
 
 
 class Alien(pygame.sprite.Sprite):
@@ -130,6 +152,7 @@ class Alien(pygame.sprite.Sprite):
                 if game.game_continue: game.score+=1
                 self.kill()
 
+
 class Generator:
     def __init__(self, game):
         margin = 30
@@ -137,6 +160,7 @@ class Generator:
         for x in range(margin, game.width-margin, width):
             for y in range(margin, int(game.height/2), width):
                 game.aliens.append(Alien(game, x, y))
+
 
 class Rocket:
     def __init__(self, game, x, y):
@@ -149,6 +173,7 @@ class Rocket:
                          (255, 50, 100), #crimson
                          pygame.Rect(self.x, self.y, 3, 10))
         self.y -= 2  
+
 
 if __name__ == "__main__":
     game = Game(600, 800)

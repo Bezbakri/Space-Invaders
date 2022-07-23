@@ -1,6 +1,6 @@
 # A Space Invaders clone in Python
 
-Use your arrow keys (or the 'A' and 'D' keys) to move, and Spacebar to shoot. Try to get the highest score, and don't get hit!
+Use your arrow keys (or the 'A' and 'D' keys) to move, and Spacebar to shoot. Try to get the highest score possible (it does get saved), and don't get hit!
 
 ## setup
 
