@@ -3,6 +3,11 @@ import sys
 from os.path import exists as file_exists
 import math
 
+pygame.mixer.init()
+hit = pygame.mixer.Sound("assets/hit.ogg")
+death = pygame.mixer.Sound("assets/death.ogg")
+victory = pygame.mixer.Sound("assets/victory.ogg")
+
 class Game:
     screen = None
     aliens = []
@@ -32,6 +37,7 @@ class Game:
         while True:
             
             if len(self.aliens) == 0:
+                pygame.mixer.Sound.play(victory)
                 self.displayText("You survived!", 60, (self.width/5, self.height/4))
                 self.displayText(f"Final Score: {self.score}", 50,  (self.width/6, self.height/2))
                 if self.score > self.highscore:
@@ -121,6 +127,7 @@ class Spaceship(pygame.sprite.Sprite):
     def alienCollision(self, game):
         for alien in game.aliens:
             if math.sqrt(math.pow(self.rect.centerx-alien.rect.centerx,2) + math.pow(self.rect.centery-alien.rect.centery,2))<=50:
+                pygame.mixer.Sound.play(death)
                 game.aliens.remove(alien)
                 alien.kill()
                 game.game_continue = False
@@ -147,6 +154,7 @@ class Alien(pygame.sprite.Sprite):
     def checkCollision(self, game):
         for rocket in game.rockets:
             if math.sqrt(math.pow(self.rect.centerx-rocket.x,2) + math.pow(self.rect.centery-rocket.y,2))<=30:
+                pygame.mixer.Sound.play(hit)
                 game.rockets.remove(rocket)
                 game.aliens.remove(self)
                 if game.game_continue: game.score+=1
